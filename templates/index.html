@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Image</title>
+    <link rel="stylesheet" href="static/styleing.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Upload an Image for Text Extraction</h1>
+        <form id="upload-form" enctype="multipart/form-data">
+            <input type="file" name="image" id="image-input" required>
+            <button type="submit">Process Image</button>
+        </form>
+
+        <h2>Extracted Ingredients:</h2>
+        <ul id="ingredient-list"></ul>
+    </div>
+    
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            let formData = new FormData();
+            let imageFile = document.getElementById('image-input').files[0];
+            formData.append('image', imageFile);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                let list = document.getElementById('ingredient-list');
+                list.innerHTML = ''; // Clear previous results
+                
+                if (data.ingredients.length === 0) {
+                    list.innerHTML = '<p>No ingredients found!</p>';
+                } else {
+                    data.ingredients.forEach(ingredient => {
+                        let li = document.createElement('li');
+                        let color = 'black'; // Default color
+
+                        if (ingredient.category === "Good") color = "green";
+                        if (ingredient.category === "Moderate") color = "yellow";
+                        if (ingredient.category === "Harmful") color = "red";
+                        
+                        li.innerHTML = `<div style="margin-bottom: 10px; padding: 8px; border-radius: 5px; background-color: rgba(255, 255, 255, 0.2);">
+                        <span style="font-weight: bold; color: ${color}; font-size: 18px;">${ingredient.name}</span> 
+                        <span style="font-size: 16px;"> - ${ingredient.category}</span> 
+                        <br>
+                        <small style="display: block; color: #333; font-style: italic;">${ingredient.effect}</small>
+                        <br>
+                        <strong>Alternative:</strong> <span style="color: blue;">${ingredient.alternative}</span> 
+                    </div>`;
+
+    list.appendChild(li);
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

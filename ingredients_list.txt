@@ -1,0 +1,13 @@
+sodium
+calcium
+potassium
+iron
+magnesium
+zinc
+vitamin A
+vitamin C
+sugar
+protein
+Dietary fiber
+Total fat
+Cholesterol
